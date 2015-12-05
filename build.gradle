@@ -1,0 +1,26 @@
+group 'runJar'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'groovy'
+apply plugin: 'application'
+
+mainClassName='gdky005.run.jarfile.TestJar'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'de.sciss:weblaf:1.27'
+    compile 'org.codehaus.gpars:gpars:0.12'
+    compile 'org.codehaus.groovy:groovy-all:2.3.11'
+}
+
+task uberjar(type: Jar,dependsOn:[':compileJava', ':compileGroovy']) {
+    from files(sourceSets.main.output.classesDir)
+    from configurations.runtime.asFileTree.files.collect { zipTree(it) }
+
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+}
