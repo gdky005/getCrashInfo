@@ -1,11 +1,17 @@
 package gdky005.run.jarfile;
 
+import com.alee.laf.button.WebButton;
+import com.alee.laf.label.WebLabel;
 import com.alee.laf.optionpane.WebOptionPane;
+import com.alee.laf.panel.WebPanel;
+import com.alee.laf.progressbar.WebProgressBar;
 import com.alee.laf.rootpane.WebDialog;
+import com.alee.laf.text.WebTextArea;
 import log.PickUpLog;
 import log.TakeFileContent;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
@@ -24,14 +30,51 @@ public class LogMainUI extends WebDialog implements ActionListener {
 
 
     private JPanel contentPane;
+    private JScrollPane scrollPane;
+
+
     private JButton doTaskButton;
     private JButton dragAreaButton;
     private JTextArea textAreaText;
     private JProgressBar progressBar;
-    private JScrollPane scrollPane;
+    private WebPanel editPanel;
+    private  WebButton retry;
 
     public LogMainUI() {
-        setContentPane(contentPane);
+
+
+        WebPanel webPanel = new WebPanel();
+        WebPanel taskPanel = new WebPanel();
+        WebPanel contentPanel = new WebPanel();
+        WebPanel buttonPanel = new WebPanel();
+        textAreaText = new WebTextArea();
+        progressBar = new WebProgressBar();
+
+        doTaskButton = new WebButton("开始收集崩溃日志");
+
+        taskPanel.add(BorderLayout.NORTH, doTaskButton);
+
+        taskPanel.add(BorderLayout.SOUTH, progressBar);
+
+
+
+        contentPanel.add(BorderLayout.NORTH,new WebLabel("请将崩溃日志的文件拖动到下面区域"));
+
+        dragAreaButton = new WebButton("拖拽区域");
+        editPanel = new WebPanel();
+
+
+        editPanel.add(BorderLayout.CENTER, dragAreaButton);
+
+        buttonPanel.add(BorderLayout.CENTER, editPanel);
+        contentPanel.add(BorderLayout.CENTER, buttonPanel);
+        taskPanel.add(BorderLayout.CENTER, contentPanel);
+        webPanel.add(taskPanel);
+
+
+
+
+        setContentPane(webPanel);
         setModal(true);
 
         textAreaText.setLineWrap(true);
@@ -40,9 +83,6 @@ public class LogMainUI extends WebDialog implements ActionListener {
         progressBar.setValue(100);
         progressBar.setAutoscrolls(true);
         progressBar.setVisible(false);
-
-//        scrollPane.setPreferredSize(new Dimension(width,300));
-        scrollPane.setVisible(false);
 
         doTaskButton.addActionListener(this);
 
@@ -94,33 +134,65 @@ public class LogMainUI extends WebDialog implements ActionListener {
     }
 
 
+    private boolean isSuccess = false;
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == doTaskButton) {
 
+            if (!isSuccess) {
             if (filePath != null && filePath != "") {
+
+                editPanel.remove(dragAreaButton);
+
+                scrollPane = new JScrollPane(textAreaText);
+                retry = new WebButton("重新收集日志");
+
+                retry.addActionListener(this);
+
+
+                editPanel.add(BorderLayout.CENTER, scrollPane);
+                editPanel.add(BorderLayout.SOUTH, retry);
 
                 dragAreaButton.setVisible(false);
                 progressBar.setVisible(true);
 
-                scrollPane.setVisible(true);
                 textAreaText.setText("正在处理中...");
                 textAreaText.setRows(25);
 
 
                 String filePath = PickUpLog.handlerFileErrorLog(this.filePath);
 
-                TakeFileContent takeFileContent = new TakeFileContent();
 
+
+
+
+                TakeFileContent takeFileContent = new TakeFileContent();
                 textAreaText.setText(takeFileContent.getContent(filePath));
 
                 progressBar.setVisible(false);
+                isSuccess = true;
 
 
             } else {
                 showDialog("您没有选择文件,请选择后重试!");
+            }} else {
+                showDialog("请点击 重新收集日志");
             }
 
+
+        } else if (e.getSource() == retry) {
+            isSuccess = false;
+            editPanel.add(BorderLayout.CENTER, dragAreaButton);
+            dragAreaButton.setVisible(true);
+            dragAreaButton.setText("拖拽区域");
+
+
+            editPanel.remove(scrollPane);
+            editPanel.remove(retry);
+
+            filePath = null;
+            getContentPane().notifyAll();
         }
     }
 }

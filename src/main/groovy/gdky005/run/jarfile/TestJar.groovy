@@ -12,12 +12,14 @@ WebFrame webFrame = initFrame()
 
 //webFrame.add(new WebButton("hello"))
 
+
+//
 LogMainUI dialog = new LogMainUI();
 
 
 webFrame.add(dialog.getContentPane())
 
-show(webFrame)
+//show(webFrame)
 
 private show(WebFrame webFrame) {
     webFrame.setVisible(true)

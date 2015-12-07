@@ -1,10 +1,10 @@
 group 'runJar'
-version '1.0-SNAPSHOT'
+version '1.0'
 
 apply plugin: 'groovy'
 apply plugin: 'application'
 
-mainClassName='gdky005.run.jarfile.TestJar'
+mainClassName='gdky005.run.jarfile.MainJar'
 
 repositories {
     mavenCentral()
