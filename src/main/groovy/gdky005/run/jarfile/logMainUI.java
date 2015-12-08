@@ -1,5 +1,6 @@
 package gdky005.run.jarfile;
 
+import com.alee.laf.WebFonts;
 import com.alee.laf.button.WebButton;
 import com.alee.laf.label.WebLabel;
 import com.alee.laf.optionpane.WebOptionPane;
@@ -50,17 +51,21 @@ public class LogMainUI extends WebDialog implements ActionListener {
         textAreaText = new WebTextArea();
         progressBar = new WebProgressBar();
 
+
         doTaskButton = new WebButton("开始收集崩溃日志");
+        doTaskButton.setFont(getSystemTextFont());
 
         taskPanel.add(BorderLayout.NORTH, doTaskButton);
 
         taskPanel.add(BorderLayout.SOUTH, progressBar);
 
 
-
-        contentPanel.add(BorderLayout.NORTH,new WebLabel("请将崩溃日志的文件拖动到下面区域"));
+        WebLabel webLabel = new WebLabel("请将崩溃日志的文件拖动到下面区域");
+        webLabel.setFont(getSystemTextFont());
+        contentPanel.add(BorderLayout.NORTH, webLabel);
 
         dragAreaButton = new WebButton("拖拽区域");
+        dragAreaButton.setFont(getSystemTextFont());
         editPanel = new WebPanel();
 
 
@@ -147,7 +152,7 @@ public class LogMainUI extends WebDialog implements ActionListener {
 
                 scrollPane = new JScrollPane(textAreaText);
                 retry = new WebButton("重新收集日志");
-
+                retry.setFont(getSystemTextFont());
                 retry.addActionListener(this);
 
 
@@ -158,6 +163,7 @@ public class LogMainUI extends WebDialog implements ActionListener {
                 progressBar.setVisible(true);
 
                 textAreaText.setText("正在处理中...");
+                textAreaText.setFont(WebFonts.getSystemTitleFont());
                 textAreaText.setRows(25);
 
 
@@ -200,5 +206,10 @@ public class LogMainUI extends WebDialog implements ActionListener {
             filePath = null;
             getContentPane().notifyAll();
         }
+    }
+
+    private Font getSystemTextFont() {
+//        return WebFonts.getSystemTextFont();
+        return new Font("dialog", Font.PLAIN, 12);
     }
 }
