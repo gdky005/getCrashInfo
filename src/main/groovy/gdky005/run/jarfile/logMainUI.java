@@ -135,7 +135,13 @@ public class LogMainUI extends WebDialog implements ActionListener {
     }
 
     private void showDialog(String tempPath) {
-        WebOptionPane.showMessageDialog(null, tempPath);
+
+        JLabel jLabel = new JLabel(tempPath);
+
+        jLabel.setText(tempPath);
+        jLabel.setFont(WebFonts.getSystemTitleFont());
+
+        WebOptionPane.showMessageDialog(jLabel, tempPath);
     }
 
 
@@ -168,9 +174,6 @@ public class LogMainUI extends WebDialog implements ActionListener {
 
 
                 String filePath = PickUpLog.handlerFileErrorLog(this.filePath);
-
-
-
 
                 String content;
                 if (filePath != null && !filePath.equals("")) {
