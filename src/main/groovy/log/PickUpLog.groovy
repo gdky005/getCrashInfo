@@ -39,6 +39,7 @@ class PickUpLog {
     public static def debugTextTag = "DEBUG   : "
     public static def deviceInfoTag = "Build fingerprint: '"
     public static def codeModeTag = "    "
+    public static def mvpCode
 
     public static int count = 0;
     public static int jniSummaryCount = 1;
@@ -58,8 +59,24 @@ class PickUpLog {
         handlerFileErrorLog(file)
     }
 
+    public static String reset() {
+        count = 0;
+        jniSummaryCount = 1;
+        backtraceCountTag = 0;
+        normalMaxCount = -1
+        errorCount = 1
+        upWord = false;
+        isAppend = false;
+        isAddNormalState = false
+        isBlodState = false
+        isFatalLog = false
+        normalMaxCount = -1
+        errorCount = 1
+    }
+
 
     public static String handlerFileErrorLog(String filePath) {
+        reset()
 
         def file = filePath
         File fileP = new File(file)
@@ -88,7 +105,7 @@ class PickUpLog {
         generaFile(jniSummaryInfoName, summaryBugInfoList)
         generaFile(normalSummaryInfoName, normalBugInfoList)
 
-        if (isFatalLog && new File(normalSummaryInfoName).exists()) {
+        if (new File(normalSummaryInfoName).exists()) {
             normalSummaryInfoName
         } else if (new File(jniSummaryInfoName).exists()){
             jniSummaryInfoName
@@ -120,8 +137,11 @@ class PickUpLog {
 
     public static def fatalFlag = "FATAL"
     public static def processFlag = "Process"
+    public static def exceptionFlag = "EXCEPTION: main"
+    public static def excepFlag = "Exception"
     public static def androidRuntimeFlag = "AndroidRuntime"
     public static def androidRuntimeKeyWord = "AndroidRuntime: "
+    public static def firstOfndroidRuntimeKeyWord = ": "
     public static def isAddNormalState = false
     public static def isBlodState = false
     public static def isFatalLog = false
@@ -154,6 +174,10 @@ class PickUpLog {
             if (!line.equals("")) {
                 normalMaxCount--
 
+                if (!isBlodState && line.contains(exceptionFlag)) {
+                    isBlodState = true
+                }
+
                 if (isBlodState) {
                     isFatalLog = true
                     isBlodState = false
@@ -161,17 +185,22 @@ class PickUpLog {
                     normalBugInfoList.add("# fatal 崩溃日志:" + lineRNTag + " " + lineRNTag)
                     normalBugInfoList.add("## 设备信息是: " + deviceInfo)
 
-                    String mainKeyWord = "### 崩溃 " + (errorCount++) + ": " + handlerLineText(true, androidRuntimeKeyWord, line).trim()  + "<br><br>"
-                    normalBugInfoList.add(mainKeyWord)
                 }
 
-                normalTempArrayList.add(handlerLineText(true, androidRuntimeKeyWord, line) + lineNTag)
-
-                if (line.contains(processFlag)) {
-                    isBlodState = true
+                if (line.contains(excepFlag) && line.contains(androidRuntimeFlag) && !line.contains(fatalFlag)) {
+                    mvpCode = handlerLineText(true, firstOfndroidRuntimeKeyWord, line).trim()
                 }
+
+                normalTempArrayList.add(handlerLineText(true, firstOfndroidRuntimeKeyWord, line) + lineNTag)
+
+
 
                 if (normalMaxCount == 0) {
+
+                    String mainKeyWord = "### 崩溃 " + (errorCount++) + ": " + mvpCode  + "<br><br>"
+                    normalBugInfoList.add(mainKeyWord)
+                    mvpCode = ""
+
                     normalBugInfoList.addAll(normalTempArrayList)
                     normalTempArrayList.clear()
                     isAddNormalState = false
@@ -303,7 +332,7 @@ class PickUpLog {
      * @return 处理后的结果
      */
     private static String handlerLineText(boolean isCode, String keyWord, String line) {
-        def lineText = line.subSequence(line.lastIndexOf(keyWord) + (keyWord.length() - 1), line.length())
+        def lineText = line.subSequence(line.indexOf(keyWord) + (keyWord.length() - 1), line.length())
 
         if (isCode) {
             lineText = codeModeTag + lineText //使用md格式的code方式
