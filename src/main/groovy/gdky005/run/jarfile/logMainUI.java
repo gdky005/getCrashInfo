@@ -166,9 +166,15 @@ public class LogMainUI extends WebDialog implements ActionListener {
 
 
 
+                String content;
+                if (filePath != null && !filePath.equals("")) {
+                    TakeFileContent takeFileContent = new TakeFileContent();
+                    content = takeFileContent.getContent(filePath);
+                } else {
+                    content = "暂时没有获取到崩溃日志";
+                }
+                textAreaText.setText(content);
 
-                TakeFileContent takeFileContent = new TakeFileContent();
-                textAreaText.setText(takeFileContent.getContent(filePath));
 
                 progressBar.setVisible(false);
                 isSuccess = true;

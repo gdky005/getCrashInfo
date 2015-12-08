@@ -28,6 +28,9 @@ package log
 class PickUpLog {
 
     public static def pidTag = "pid"
+    public static def debugTag = "DEBUG"
+    public static def crashAnrDetectorTag = "CrashAnrDetector"
+    public static def buildFingerprintTag = "Build fingerprint"
     public static def lineRNTag = "\r\n"
     public static def lineNTag = "\n"
     public static def signalTag = "signal"
@@ -37,107 +40,190 @@ class PickUpLog {
     public static def deviceInfoTag = "Build fingerprint: '"
     public static def codeModeTag = "    "
 
+    public static int count = 0;
+    public static int jniSummaryCount = 1;
+    public static boolean upWord = false;
+    public static boolean isAppend = false;
+
+    public static ArrayList normalTempArrayList
+
+
+
+
+
+    public static void main(String[] args) {
+//        def file = "./assets/error_log.txt"
+        def file = "./assets/normal_error_log1.txt"
+
+        handlerFileErrorLog(file)
+    }
+
 
     public static String handlerFileErrorLog(String filePath) {
 
         def file = filePath
         File fileP = new File(file)
         String fileParentPath = fileP.getParent()
+        String fileName = fileP.getName()
+
+        if (fileName != null && !fileName.equals("")) {
+            fileName = fileName.substring(0, fileName.lastIndexOf("."))
+        }
+
+
+        normalTempArrayList = new ArrayList()
 
         ArrayList detailBugInfoList = new ArrayList();
         ArrayList summaryBugInfoList = new ArrayList();
+        ArrayList normalBugInfoList = new ArrayList();
 
-        handlerPerLine(file, summaryBugInfoList, detailBugInfoList)
+        handlerPerLine(file, summaryBugInfoList, detailBugInfoList, normalBugInfoList)
 
-
-//        def jniDetailInfoName = fileParentPath + "/out/my_info.md"
-//        def jniSummaryInfoName = fileParentPath + "/out/jni_summary_info.md"
-//
-        def jniDetailInfoName = fileParentPath + "/out/my_info.md"
-        def jniSummaryInfoName = fileParentPath + "/out/jni_summary_info.md"
+        def jniDetailInfoName = fileParentPath + "/out/" + fileName + "-jni_info.md"
+        def jniSummaryInfoName = fileParentPath + "/out/" + fileName + "-jni_summary_info.md"
+        def normalSummaryInfoName = fileParentPath + "/out/" + fileName + "-normal_summary_info.md"
 
 
         generaFile(jniDetailInfoName, detailBugInfoList)
         generaFile(jniSummaryInfoName, summaryBugInfoList)
+        generaFile(normalSummaryInfoName, normalBugInfoList)
 
-        jniSummaryInfoName
+        if (isFatalLog && new File(normalSummaryInfoName).exists()) {
+            normalSummaryInfoName
+        } else if (new File(jniSummaryInfoName).exists()){
+            jniSummaryInfoName
+        }
+
     }
-
-//    public static void main(String[] args) {
-//        handlerFileErrorLog("./assets/error_log.txt")
-//    }
-
-
-//    public static void main(String[] args) {
-//
-//        def file = "./assets/error_log.txt"
-//
-//        ArrayList detailBugInfoList = new ArrayList();
-//        ArrayList summaryBugInfoList = new ArrayList();
-//
-//        handlerPerLine(file, summaryBugInfoList, detailBugInfoList)
-//
-//
-//        def jniDetailInfoName = "./out/my_info.md"
-//        def jniSummaryInfoName = "./out/jni_summary_info.md"
-//
-//
-//        generaFile(jniDetailInfoName, detailBugInfoList)
-//        generaFile(jniSummaryInfoName, summaryBugInfoList)
-//    }
 
     /**
      * 处理每一行的数据
      *
      * @param file
-     * @param summaryBugInfoList
-     * @param detailBugInfoList
+     * @param jniSummaryBugInfoList
+     * @param jniDetailBugInfoList
      * @param isAppend
      * @param upWord
      * @param count
      * @return
      */
-    private static void handlerPerLine(String file, ArrayList summaryBugInfoList, detailBugInfoList) {
+    private static void handlerPerLine(String file, ArrayList jniSummaryBugInfoList, ArrayList jniDetailBugInfoList,
+                                       ArrayList normalBugInfoList) {
 
-        int count = 0;
-        boolean upWord = false;
-        boolean isAppend = false;
 
         new File(file).eachLine { line ->
 
-            if (line.contains("DEBUG") && line.contains("Build fingerprint")) {
-                isAppend = true
-                upWord = true
+            getFatalErrorLog(line, normalBugInfoList)
+            getJniErrorLog(line, jniSummaryBugInfoList, jniDetailBugInfoList)
+        }
+    }
+
+    public static def fatalFlag = "FATAL"
+    public static def processFlag = "Process"
+    public static def androidRuntimeFlag = "AndroidRuntime"
+    public static def androidRuntimeKeyWord = "AndroidRuntime: "
+    public static def isAddNormalState = false
+    public static def isBlodState = false
+    public static def isFatalLog = false
+    //最多累计15个字符, 默认为-1
+    public static def normalMaxCount = -1
+    public static int errorCount = 1
+
+    public static String deviceInfo
 
 
-                summaryBugInfoList.add("# 主要崩溃日志：" + lineRNTag)
-                summaryBugInfoList.add("### 手机和应用信息：" + lineRNTag)
-                summaryBugInfoList.add(codeModeTag +
-                        line.subSequence(line.lastIndexOf(deviceInfoTag) + deviceInfoTag.length(), line.length() - 1) +
-                        lineNTag)
 
+    /**
+     *
+     * @param line
+     * @param normalBugInfoList
+     */
+    private static void getFatalErrorLog(String line, ArrayList normalBugInfoList) {
 
-                detailBugInfoList.add("# 应用崩溃详细日志：" + lineRNTag)
-                detailBugInfoList.add(handlerLineText(true, deviceInfoTag, line))
-                return
+        if (line.contains("Build fingerprint")) {
+            deviceInfo = handlerLineText(false, deviceInfoTag, line)
+        }
+
+        if (line.contains(fatalFlag) && line.contains(androidRuntimeFlag)) {
+            normalTempArrayList.clear()
+            isAddNormalState = true
+            normalMaxCount = 15
+        }
+
+        if (isAddNormalState && normalMaxCount >= 0 && line.contains(androidRuntimeFlag)) {
+            if (!line.equals("")) {
+                normalMaxCount--
+
+                if (isBlodState) {
+                    isFatalLog = true
+                    isBlodState = false
+
+                    normalBugInfoList.add("# fatal 崩溃日志:" + lineRNTag + " " + lineRNTag)
+                    normalBugInfoList.add("## 设备信息是: " + deviceInfo)
+
+                    String mainKeyWord = "### 崩溃 " + (errorCount++) + ": " + handlerLineText(true, androidRuntimeKeyWord, line).trim()  + "<br><br>"
+                    normalBugInfoList.add(mainKeyWord)
+                }
+
+                normalTempArrayList.add(handlerLineText(true, androidRuntimeKeyWord, line) + lineNTag)
+
+                if (line.contains(processFlag)) {
+                    isBlodState = true
+                }
+
+                if (normalMaxCount == 0) {
+                    normalBugInfoList.addAll(normalTempArrayList)
+                    normalTempArrayList.clear()
+                    isAddNormalState = false
+                    normalMaxCount = -1
+                }
+
             }
+        }
 
-            if (isAppend && upWord && (line.contains("DEBUG") || line.equals(""))) {
-                if (!line.equals("")) {
 
-                    getSummaryBugInfo(summaryBugInfoList, line)
 
-                    detailBugInfoList.add(handlerLineText(true, debugTextTag, line))
-                }
-            } else if (isAppend && upWord && !line.contains("DEBUG")) {
-                if (count == 3) {
-                    count = 0
+    }
 
-                    isAppend = false
-                    upWord = false
-                } else {
-                    count++
-                }
+    /**
+     * 获取 JNI日志功能
+     * @param line
+     * @param jniSummaryBugInfoList
+     * @param jniDetailBugInfoList
+     */
+    private static void getJniErrorLog(String line, ArrayList jniSummaryBugInfoList, ArrayList jniDetailBugInfoList) {
+        if ((line.contains(debugTag) && line.contains(buildFingerprintTag)) || (line.contains(crashAnrDetectorTag) && line.contains(buildFingerprintTag))) {
+            isAppend = true
+            upWord = true
+
+
+            jniSummaryBugInfoList.add("# 主要崩溃日志：" + lineRNTag)
+            jniSummaryBugInfoList.add("### 手机和应用信息：" + lineRNTag)
+            jniSummaryBugInfoList.add(handlerLineText(true, deviceInfoTag, line))
+            jniDetailBugInfoList.add("# 应用崩溃详细日志 " + (jniSummaryCount++) + "：" + lineRNTag)
+            jniDetailBugInfoList.add(handlerLineText(true, deviceInfoTag, line))
+            return
+        }
+
+        if (line.contains("CrashAnrDetector: backtrace")) {
+            println "test"
+        }
+
+        if (isAppend && upWord && ((line.contains(crashAnrDetectorTag)|| line.equals("")) || (line.contains(debugTag) || line.equals("")))) {
+            if (!line.equals("")) {
+
+                getSummaryBugInfo(jniSummaryBugInfoList, line)
+
+                jniDetailBugInfoList.add(handlerLineText(true, debugTextTag, line))
+            }
+        } else if (isAppend && upWord && !line.contains(debugTag)) {
+            if (count == 3) {
+                count = 0
+
+                isAppend = false
+                upWord = false
+            } else {
+                count++
             }
         }
     }
@@ -177,11 +263,13 @@ class PickUpLog {
     /**
      * 根据获取的到的list将数据保存到文件中
      *
-     * @param bugInfoList     获取信息后的List
-     * @param fileName    生成文件的名字
+     * @param bugInfoList 获取信息后的List
+     * @param fileName 生成文件的名字
      */
     private static void generaFile(String fileName, ArrayList bugInfoList) {
         if (bugInfoList != null && bugInfoList.size() > 0) {
+
+            fileName = fileName.replace("assets", "build")
 
             File file1 = new File(fileName);
 
@@ -199,7 +287,7 @@ class PickUpLog {
                 StringBuffer stringBuffer = new StringBuffer();
 
                 for (int i = 0; i < bugInfoList.size(); i++) {
-                    stringBuffer.append(bugInfoList.get(i) + "\r\n")
+                    stringBuffer.append(bugInfoList.get(i) + lineRNTag)
                 }
 
                 printWriter.println(stringBuffer.toString())
@@ -210,13 +298,12 @@ class PickUpLog {
     /**
      * 根据关键字获取 获取处理结果后的文本
      *
-     * @param keyWord   关键字
-     * @param line  当前一行是文本
+     * @param keyWord 关键字
+     * @param line 当前一行是文本
      * @return 处理后的结果
      */
-    private static CharSequence handlerLineText(boolean isCode, String keyWord, String line) {
-
-        CharSequence lineText = line.subSequence(line.lastIndexOf(keyWord) + (keyWord.length() - 1), line.length())
+    private static String handlerLineText(boolean isCode, String keyWord, String line) {
+        def lineText = line.subSequence(line.lastIndexOf(keyWord) + (keyWord.length() - 1), line.length())
 
         if (isCode) {
             lineText = codeModeTag + lineText //使用md格式的code方式
