@@ -40,7 +40,7 @@
 
 ### 运行的效果图是:
 
-![](https://github.com/gdky005/gradle-groovy-runJar/blob/master/image/error_log.gif?raw=true)
+![](https://github.com/gdky005/getCrashInfo/blob/master/image/error_log.gif?raw=true)
 
 
 ### 参考地址:
