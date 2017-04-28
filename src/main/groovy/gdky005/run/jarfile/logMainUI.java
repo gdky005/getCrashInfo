@@ -23,9 +23,9 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
 
-public class LogMainUI extends WebDialog implements ActionListener {
+class LogMainUI extends WebDialog implements ActionListener {
 
-    public static final int width = 400;
+    public static final int width = 450;
 
     private String filePath;
 

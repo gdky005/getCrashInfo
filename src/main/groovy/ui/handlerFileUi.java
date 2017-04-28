@@ -6,7 +6,7 @@ import java.awt.*;
 /**
  * Created by WangQing on 15/12/6.
  */
-public class HandlerFileUi extends JFrame{
+class HandlerFileUi extends JFrame{
     private JTextField loadingText;
     private JPanel panel1;
     private JProgressBar progressBar;
