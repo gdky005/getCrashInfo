@@ -45,3 +45,6 @@
 
 ### 参考地址:
 https://github.com/bond-/gradle-groovy-jar-example
+
+使用GUI绘图，依靠该版本解决 生成 可行性 jar 的问题
+http://stackoverflow.com/questions/13744779/exporting-intellij-idea-ui-form-to-eclipse 

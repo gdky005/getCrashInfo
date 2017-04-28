@@ -22,14 +22,14 @@ frame.add(button1);
 
 //为button2进行约束
 c1.fill=GridBagConstraints.HORIZONTAL;
-JButton button2=new JButton("左Button");
+JButton button2=new JButton("leftBtn");
 grid.setConstraints(button2,c1);
 frame.add(button2);
 c1.insets
 //为button3进行约束
 c1.gridx=0;          c1.gridy=1;          //动态表格（0，1）位置
 c1.gridwidth=4;         //组件长占4个单元格，高占一个单元格
-JButton button3=new JButton("右Button");
+JButton button3=new JButton("rightBtn");
 grid.setConstraints(button3,c1);
 frame.add(button3);
 frame.setVisible(true);
