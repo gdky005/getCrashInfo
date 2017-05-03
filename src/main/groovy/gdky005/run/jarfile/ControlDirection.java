@@ -1,5 +1,6 @@
 package gdky005.run.jarfile;
 
+import com.alee.laf.WebFonts;
 import kaola.monkey.StartCommond;
 
 import javax.swing.*;
@@ -30,7 +31,24 @@ public class ControlDirection implements ActionListener {
     private JPanel topPanel;
     private JLabel title;
 
+    private Font getSystemTextFont() {
+//        return WebFonts.getSystemTextFont();
+        return new Font("宋体", Font.BOLD, 16);
+    }
+
     public ControlDirection() {
+
+        upBtn.setFont(getSystemTextFont());
+        downBtn.setFont(getSystemTextFont());
+        okBtn.setFont(getSystemTextFont());
+        leftBtn.setFont(getSystemTextFont());
+        rightBtn.setFont(getSystemTextFont());
+        okBtn1.setFont(getSystemTextFont());
+        cancelBtn.setFont(getSystemTextFont());
+        topPanel.setFont(getSystemTextFont());
+        title.setFont(getSystemTextFont());
+
+
         upBtn.addActionListener(this);
         downBtn.addActionListener(this);
         okBtn.addActionListener(this);
