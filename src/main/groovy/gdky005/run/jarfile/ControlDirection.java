@@ -1,6 +1,8 @@
 package gdky005.run.jarfile;
 
-import com.alee.laf.WebFonts;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.uiDesigner.core.Spacer;
 import kaola.monkey.StartCommond;
 
 import javax.swing.*;
@@ -14,11 +16,16 @@ import java.awt.event.ActionListener;
 public class ControlDirection implements ActionListener {
 
     private static final int KEYCODE_ENTER = 66;
-    private static final int KEYCODE_DPAD_CENTER = 23;
+    private static final int KEYCODE_OK = 23;
+    private static final int KEYCODE_DPAD_GOBACK = 4;
     private static final int KEYCODE_DPAD_UP = 19;
     private static final int KEYCODE_DPAD_DOWN = 20;
     private static final int KEYCODE_DPAD_LEFT = 21;
     private static final int KEYCODE_DPAD_RIGHT = 22;
+    private static final int KEYCODE_DPAD_VOLUME_DOWN = 25;
+    private static final int KEYCODE_DPAD_VOLUME_UP = 24;
+    private static final int KEYCODE_DPAD_MENU = 82;
+    private static final int KEYCODE_DPAD_HOME = 3;
 
 
     private JButton upBtn;
@@ -30,6 +37,10 @@ public class ControlDirection implements ActionListener {
     private JButton cancelBtn;
     private JPanel topPanel;
     private JLabel title;
+    private JButton volume_down;
+    private JButton volume_up;
+    private JButton menu;
+    private JButton home;
 
     private Font getSystemTextFont() {
 //        return WebFonts.getSystemTextFont();
@@ -47,6 +58,10 @@ public class ControlDirection implements ActionListener {
         cancelBtn.setFont(getSystemTextFont());
         topPanel.setFont(getSystemTextFont());
         title.setFont(getSystemTextFont());
+        volume_down.setFont(getSystemTextFont());
+        volume_up.setFont(getSystemTextFont());
+        menu.setFont(getSystemTextFont());
+        home.setFont(getSystemTextFont());
 
 
         upBtn.addActionListener(this);
@@ -56,6 +71,10 @@ public class ControlDirection implements ActionListener {
         rightBtn.addActionListener(this);
         okBtn1.addActionListener(this);
         cancelBtn.addActionListener(this);
+        volume_down.addActionListener(this);
+        volume_up.addActionListener(this);
+        menu.addActionListener(this);
+        home.addActionListener(this);
     }
 
 
@@ -93,13 +112,25 @@ public class ControlDirection implements ActionListener {
             directionCode = KEYCODE_DPAD_RIGHT;
         } else if (e.getSource() == okBtn) {
             text = "Ok";
-            directionCode = KEYCODE_ENTER;
+            directionCode = KEYCODE_OK;
         } else if (e.getSource() == okBtn1) {
             text = "确定";
             directionCode = KEYCODE_ENTER;
         } else if (e.getSource() == cancelBtn) {
-            text = "取消";
-            directionCode = KEYCODE_DPAD_CENTER;
+            text = "返回";
+            directionCode = KEYCODE_DPAD_GOBACK;
+        } else if (e.getSource() == volume_down) {
+            text = "音量减";
+            directionCode = KEYCODE_DPAD_VOLUME_DOWN;
+        } else if (e.getSource() == volume_up) {
+            text = "音量加";
+            directionCode = KEYCODE_DPAD_VOLUME_UP;
+        } else if (e.getSource() == menu) {
+            text = "菜单键";
+            directionCode = KEYCODE_DPAD_MENU;
+        } else if (e.getSource() == home) {
+            text = "home键";
+            directionCode = KEYCODE_DPAD_HOME;
         }
 
         String adbShell = "adb shell input keyevent " + directionCode;
@@ -172,31 +203,35 @@ public class ControlDirection implements ActionListener {
         gbc.ipadx = 50;
         gbc.ipady = 45;
         topPanel.add(rightBtn, gbc);
-        final JPanel spacer1 = new JPanel();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 5;
-        gbc.fill = GridBagConstraints.VERTICAL;
-        gbc.ipady = 50;
-        topPanel.add(spacer1, gbc);
         final JPanel panel1 = new JPanel();
-        panel1.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        panel1.setLayout(new GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, -1));
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 6;
+        gbc.gridy = 7;
         gbc.gridwidth = 3;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.ipady = 50;
         topPanel.add(panel1, gbc);
         final JPanel panel2 = new JPanel();
-        panel2.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
-        panel1.add(panel2, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        panel2.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
+        panel1.add(panel2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         okBtn1 = new JButton();
         okBtn1.setText("确定");
-        panel2.add(okBtn1, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, new Dimension(70, 50), null, new Dimension(-1, 100), 0, false));
+        panel2.add(okBtn1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(70, 50), null, new Dimension(-1, 100), 0, false));
         cancelBtn = new JButton();
-        cancelBtn.setText("取消");
-        panel2.add(cancelBtn, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, new Dimension(70, 50), null, new Dimension(-1, 100), 0, false));
+        cancelBtn.setText("返回");
+        panel2.add(cancelBtn, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(70, 50), null, new Dimension(-1, 100), 0, false));
+        final JPanel panel3 = new JPanel();
+        panel3.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
+        panel1.add(panel3, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        menu = new JButton();
+        menu.setText("菜单键");
+        panel3.add(menu, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(70, 50), null, new Dimension(-1, 100), 0, false));
+        home = new JButton();
+        home.setText("Home键");
+        panel3.add(home, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(70, 50), null, new Dimension(-1, 100), 0, false));
+        final Spacer spacer1 = new Spacer();
+        panel1.add(spacer1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         final JPanel spacer2 = new JPanel();
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
@@ -204,19 +239,42 @@ public class ControlDirection implements ActionListener {
         gbc.fill = GridBagConstraints.VERTICAL;
         gbc.ipady = 70;
         topPanel.add(spacer2, gbc);
-        final JPanel panel3 = new JPanel();
-        panel3.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        final JPanel panel4 = new JPanel();
+        panel4.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 3;
         gbc.fill = GridBagConstraints.BOTH;
-        topPanel.add(panel3, gbc);
+        topPanel.add(panel4, gbc);
         title = new JLabel();
         title.setEnabled(true);
         title.setFont(new Font(title.getFont().getName(), Font.BOLD, 36));
         title.setText("简易控制器");
-        panel3.add(title, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel4.add(title, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JPanel spacer3 = new JPanel();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 6;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        gbc.ipady = 50;
+        topPanel.add(spacer3, gbc);
+        volume_down = new JButton();
+        volume_down.setText("音量 -");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.ipady = 15;
+        topPanel.add(volume_down, gbc);
+        volume_up = new JButton();
+        volume_up.setText("音量 +");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 6;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.ipady = 15;
+        topPanel.add(volume_up, gbc);
     }
 
     /**
